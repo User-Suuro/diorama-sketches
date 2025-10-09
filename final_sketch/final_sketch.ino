@@ -25,12 +25,17 @@ unsigned long lastClapTime = 0;
 #define trigPin A1
 #define echoPin A2
 
+// === Light Sensor Pin (NEW) ===
+#define lightSensor A3
+#define lightThreshold 400   // Adjust this value (0–1023): lower = darker
+
 // === DFPlayer Pins ===
 #define mp3Rx 10   // Arduino RX (connect to TX of DFPlayer)
 #define mp3Tx 11   // Arduino TX (connect to RX of DFPlayer)
 
-// === LED Indicator (optional) ===
-#define ledPin 13
+// === LED Indicator ===
+#define ledPin 13    // ON kapag may tao at madilim
+#define lightLed 6   // Optional: LED light controlled by LDR (change pin if needed)
 
 SoftwareSerial mp3Serial(mp3Rx, mp3Tx);
 DFRobotDFPlayerMini mp3;
@@ -41,6 +46,7 @@ bool relayState2 = false;
 bool relayState3 = false;
 bool relayState4 = false;
 bool isPlaying = false;
+bool lightsOn = false; // For light sensor control
 
 // === Ultrasonic Variables ===
 long duration;
@@ -71,9 +77,14 @@ void setup() {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 
-  // LED
+  // Light sensor
+  pinMode(lightSensor, INPUT);
+
+  // LEDs
   pinMode(ledPin, OUTPUT);
+  pinMode(lightLed, OUTPUT);
   digitalWrite(ledPin, LOW);
+  digitalWrite(lightLed, LOW);
 
   // DFPlayer setup
   Serial.println("Initializing DFPlayer Mini...");
@@ -94,6 +105,7 @@ void loop() {
   handleTouch();
   detectSound();
   detectUltrasonic();
+  detectLight();  // <--- NEW FUNCTION CALL
 }
 
 // === TOUCH SENSOR HANDLING ===
@@ -188,7 +200,27 @@ void detectUltrasonic() {
     isPlaying = false;
   }
 
-  delay(500);
+  delay(300);
+}
+
+// === LIGHT SENSOR HANDLING ===
+void detectLight() {
+  int lightValue = analogRead(lightSensor);
+  Serial.print("Light level: ");
+  Serial.println(lightValue);
+
+  if (lightValue < lightThreshold && !lightsOn) {
+    Serial.println("Low light detected! Turning ON lights...");
+    digitalWrite(lightLed, HIGH);
+    lightsOn = true;
+  } 
+  else if (lightValue >= lightThreshold && lightsOn) {
+    Serial.println("Enough light detected! Turning OFF lights...");
+    digitalWrite(lightLed, LOW);
+    lightsOn = false;
+  }
+
+  delay(300);
 }
 
 // === RELAY UPDATE FUNCTION ===
