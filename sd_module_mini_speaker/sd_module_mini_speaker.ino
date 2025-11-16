@@ -1,14 +1,14 @@
 #include <SoftwareSerial.h>
 #include <DFRobotDFPlayerMini.h>
 
-SoftwareSerial mp3Serial(10, 11); // RX, TX
+SoftwareSerial mp3Serial(12, 13); // RX, TX
 DFRobotDFPlayerMini mp3;
 
 void setup() {
   Serial.begin(9600);
   mp3Serial.begin(9600);
 
-  if (!mp3.begin(mp3Serial)) {  // Start communication with the module
+if (!mp3.begin(mp3Serial)) {  // Start communication with the module
     Serial.println("Unable to start DFPlayer Mini!");
     Serial.println("Check wiring and SD card.");
     while (true);
@@ -21,4 +21,6 @@ void setup() {
 
 void loop() {
   // Nothing else for now
+  mp3.play(1);
+  delay(5000);
 }

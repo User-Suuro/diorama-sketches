@@ -32,7 +32,7 @@ SoftwareSerial MP3_SERIAL(DF_RX, DF_TX);
 
 // == CONSTANTS == //
 const char* ssid  = "X8b";
-const char* password = "123456789";
+const char* password = "12345678";
 const char* host = "diorama-endpoint.vercel.app";
 const int port = 443;
 
@@ -236,6 +236,10 @@ void parseResponse() {
     if (!error) {
       visitorsVal = doc["visitors_val"];
       clapsVal = doc["claps_val"];
+
+      
+      espBuffer = "";
+      espBusy = false; 
     };
   }
 }
@@ -405,7 +409,7 @@ void initMP3Player() {
     return;
   }
   Serial.println(F("DFPlayer Initialized."));
-  mp3.volume(50);
+  mp3.volume(30);
   delay(50);
   playMP3(1);
 }
